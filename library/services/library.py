@@ -5,14 +5,16 @@ from library.domain.loan import Loan
 from library.services.loan_policy import LoanPolicy
 from library.exceptions import ItemNotFoundError,ItemNotAvailableError,LoanLimitExceededError
 from library.domain.items import Book, EBook, Magazine, DVD
+from library.domain.members import StaffMember,StudentMember
 
 ITEM_TYPES = {"book": Book, "ebook": EBook, "magazine": Magazine, "dvd": DVD}
-
+MEMBER_TYPES = {"student": StudentMember, "staff": StaffMember}
 
 class Library:
    """Coordinates the collection. Composed with a Storage (injected)."""
-   def __init__(self, storage) -> None:
+   def __init__(self, storage,member_storage) -> None:
      self._storage = storage 
+     self._member_storage = member_storage
      self._items: list[LibraryItem] = []
      self._loans: list[Loan] = []
      self._members: dict[str, object] = {}
@@ -77,3 +79,18 @@ class Library:
         records = [item.to_dict() for item in self._items]
         print("Saving records")
         self._storage.save(records)
+
+   def load_members_from_storage(self) -> None:
+        records = self._member_storage.load()
+        for record in records:
+            member_cls = MEMBER_TYPES.get(record.get("type"))
+            if member_cls is None:
+                continue
+            member = member_cls.from_dict(record)
+            self._members[member._member_id] = member
+
+   def save_members_to_storage(self) -> None:
+    records = [m.to_dict() for m in self._members.values()]
+    print("Saving Members")
+    self._member_storage.save(records)
+

@@ -1,6 +1,6 @@
 from library.services.library import Library
 from library.domain.items import Book, Magazine, DVD, EBook
-from library.domain.members import StudentMember, StaffMember
+from library.domain.members import StudentMember, StaffMember, Member
 from library.exceptions import LibraryError
 from library.protocols import print_catalog
 
@@ -12,6 +12,12 @@ MENU = """
 5. Borrow item
 6. Return item
 7. Remove item
+0. Exit
+"""
+
+MENU_2 = """
+1. Borrow item
+2. Return item
 0. Exit
 """
 
@@ -47,8 +53,7 @@ def search_item(library: Library) -> None:
     for item in results:
         print(item)
 
-
-def make_member() -> object:
+def make_member() -> Member:
     role = input("Role (student/staff): ").strip().lower()
     member_id = input("Member ID: ")
     name = input("Name: ")
@@ -62,16 +67,27 @@ def register_member(library: Library) -> None:
     library.add_member(member)
     print(f"Registered: {member.name} ({member._member_id})")
 
-def borrow_item(library: Library) -> None:
-    member_id = input("Member ID: ")
-    member = library.get_member(member_id)
+def login(library: Library) -> Member:
+    while True:
+        member_id = input("Enter Member ID (or type 'new' to register): ").strip()
+        if member_id.lower() == "new":
+            member = make_member()
+            library.add_member(member)
+            print(f"Registered: {member.name} ({member._member_id})")
+            return member
+        try:
+            member = library.get_member(member_id)
+            print(f"Welcome back, {member.name}!")
+            return member
+        except LibraryError:
+            print("Member not found. Type 'new' to register.")
+
+def borrow_item(library: Library, member: Member) -> None:
     item_id = int(input("Item ID: "))
     library.borrow(member, item_id)
     print("Borrowed successfully.")
 
-def return_item(library: Library) -> None:
-    member_id = input("Member ID: ")
-    member = library.get_member(member_id)
+def return_item(library: Library, member: Member) -> None:
     item_id = int(input("Item ID: "))
     library.return_item(member, item_id)
     print("Returned successfully.")
@@ -82,22 +98,33 @@ def remove_item(library: Library) -> None:
     print("Removed.")
 
 def run(library: Library) -> None:
-    options = {
+    member = login(library)
+    is_staff = isinstance(member, StaffMember)
+
+    options_staff = {
         "1": add_item,
         "2": list_items,
         "3": search_item,
         "4": register_member,
-        "5": borrow_item,
-        "6": return_item,
+        "5": lambda lib: borrow_item(lib, member),
+        "6": lambda lib: return_item(lib, member),
         "7": remove_item,
     }
+    options_student = {
+        "1": lambda lib: borrow_item(lib, member),
+        "2": lambda lib: return_item(lib, member),
+    }
+
+    menu = MENU if is_staff else MENU_2
+    options = options_staff if is_staff else options_student
+
     while True:
-        print(MENU)
+        print(menu)
         choice = input("Choose: ").strip()
         if choice == "0":
             break
         option = options.get(choice)
-        if not options:
+        if not option:
             print("Invalid choice.")
             continue
         try:

@@ -1,6 +1,6 @@
 from library.exceptions import LoanLimitExceededError
-
-class Member:
+from abc import ABC,abstractmethod
+class Member(ABC):
   max_loans: int = 5 # class attribute (default limit)
   def __init__(self, member_id: str, name: str, email: str) -> None:
    self._member_id = member_id # protected
@@ -18,12 +18,27 @@ class Member:
     raise ValueError("invalid email")
    self._email = value
 
+  @abstractmethod
+  def role(self) -> str:
+   pass
+
+  def to_dict(self) -> dict:
+    return {
+     "type": self.role(),
+     "member_id": self._member_id,
+     "name": self.name,
+     "email": self.email,
+     }
+
+  @classmethod
+  def from_dict(cls, data: dict) -> "Member":
+   return cls(data["member_id"], data["name"], data["email"])
+  
   @property
   def borrowed(self) -> tuple[int, ...]:
    return tuple(self.__borrowed) # read-only view, encapsulation
   
   def borrow(self, item_id: int) -> None:
-   ... # TODO: enforce max_loans, else raise LoanLimitExceededError
    if len(self.__borrowed)>=self.max_loans:
     raise LoanLimitExceededError(f"{self._member_id} has exceed loan limit {self.max_loans}")
    self.__borrowed.append(item_id)
@@ -34,5 +49,11 @@ class Member:
 class StudentMember(Member):
  max_loans = 3 # polymorphism via class attribute
 
+ def role(self) -> str:
+        return "student"
+
 class StaffMember(Member):
  max_loans = 10
+
+ def role(self) -> str:
+        return "staff"
