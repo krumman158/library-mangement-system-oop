@@ -36,7 +36,7 @@ def add_item(library: Library) -> None:
     elif kind == "dvd":
         item = DVD(title, author, year)
     else:
-        print("Unknown type.")
+        print("Unknown type / Please Enter valid Input.")
         return
     library.add(item)
     print(f"Added: {item}")
@@ -46,6 +46,9 @@ def list_items(library: Library) -> None:
 
 def search_item(library: Library) -> None:
     title = input("Search title: ")
+    if not title:
+        print("Invalid Input Please enter valid title")
+        return
     results = library.find(title)
     if not results:
         print("Item Not found")
@@ -68,8 +71,8 @@ def register_member(library: Library) -> None:
     print(f"Registered: {member.name} ({member._member_id})")
 
 def login(library: Library) -> Member:
-    while True:
-        member_id = input("Enter Member ID (or type 'new' to register): ").strip()
+    while True: 
+        member_id = input("Enter Member ID (type 'new' to register): ").strip()
         if member_id.lower() == "new":
             member = make_member()
             library.add_member(member)
