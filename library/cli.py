@@ -72,8 +72,8 @@ def register_member(library: Library) -> None:
 
 def login(library: Library) -> Member:
     while True: 
-        member_id = input("Enter Member ID (type 'new' to register): ").strip()
-        if member_id.lower() == "new":
+        member_id = input("Enter Member ID (type 'new' to register): ").strip().lower()
+        if member_id == "new":
             member = make_member()
             library.add_member(member)
             print(f"Registered: {member.name} ({member._member_id})")
