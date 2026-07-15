@@ -1,10 +1,13 @@
 from datetime import date
 from library.storage.base import Storage
-from library.domain.items import LibraryItem
+from library.domain.LibrarayItem import LibraryItem
 from library.domain.loan import Loan
 from library.services.loan_policy import LoanPolicy
 from library.exceptions import ItemNotFoundError,ItemNotAvailableError,LoanLimitExceededError
-from library.domain.items import Book, EBook, Magazine, DVD
+from library.domain.book import Book
+from library.domain.ebook import EBook
+from library.domain.magazine import Magazine
+from library.domain.dvd import DVD
 from library.domain.members import StaffMember,StudentMember
 
 ITEM_TYPES = {"book": Book, "ebook": EBook, "magazine": Magazine, "dvd": DVD}
