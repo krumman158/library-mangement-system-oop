@@ -24,15 +24,19 @@ class Member(ABC):
 
   def to_dict(self) -> dict:
     return {
-     "type": self.role(),
-     "member_id": self._member_id,
-     "name": self.name,
-     "email": self.email,
-     }
-
+        "type": self.role(),
+        "member_id": self._member_id,
+        "name": self.name,
+        "email": self.email,
+        "borrowed": ",".join(str(i) for i in self.__borrowed),
+    }
+  
   @classmethod
   def from_dict(cls, data: dict) -> "Member":
-   return cls(data["member_id"], data["name"], data["email"])
+    m = cls(data["member_id"], data["name"], data["email"])
+    raw = data.get("borrowed", "")
+    m._Member__borrowed = [int(x) for x in raw.split(",") if x]
+    return m
   
   @property
   def borrowed(self) -> tuple[int, ...]:
@@ -44,6 +48,8 @@ class Member(ABC):
    self.__borrowed.append(item_id)
    
   def return_item(self, item_id: int) -> None:
+    if item_id not in self.__borrowed:
+        raise ValueError(f"Item {item_id} not borrowed.")
     self.__borrowed.remove(item_id)
 
 class StudentMember(Member):

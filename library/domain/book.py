@@ -7,7 +7,7 @@ class Book(LibraryItem):
    return self.LOAN_DAYS
   
   def display_info(self) -> str:
-   return f"Book: {self.title} by {self.author} ({self.year})"
+   return f"ID: {self.id}  Book: {self.title} by {self.author} ({self.year})  Available: {self._available}"
   
   def to_dict(self) -> dict:
         return {
@@ -15,12 +15,19 @@ class Book(LibraryItem):
             "title": self.title,
             "author": self.author,
             "year": str(self.year),
+            "available":self._available,
+            "ID":self.id
         }
   
   @classmethod
   def from_dict(cls, data: dict) -> "Book":
-   """Factory constructor — rebuild a Book from a stored record."""
-   return cls(data["title"], data["author"], int(data["year"]))
+    return cls(
+      data["title"],
+      data["author"],
+      int(data["year"]),
+      str(data['available']).strip().lower() == "true",
+      int(data['ID'])
+      )
   
   #coulbe used in sort
   def __lt__(self, other: "Book") -> bool: # enables sorted()

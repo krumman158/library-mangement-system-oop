@@ -7,4 +7,4 @@ class DVD(LibraryItem):
   return self.LOAN_DAYS
   
  def display_info(self) -> str:
-  return f"DVD: {self.title} ({self.year})"
+  return f"DVD: {self.title} ({self.year})  Available: {self._available}"

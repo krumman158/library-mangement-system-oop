@@ -7,5 +7,5 @@ class Magazine(LibraryItem):
    return self.LOAN_DAYS
   
  def display_info(self) -> str:
-  return f"Magazine: {self.title} ({self.year})"
+  return f"Magazine: {self.title} ({self.year})  Available: {self._available}"
  

@@ -2,13 +2,18 @@ from abc import ABC, abstractmethod
 class LibraryItem(ABC):
    """Contract for anything the library lends."""
    _next_id: int = 0 # class attribute (shared counter)
-   def __init__(self, title: str, author: str, year: int) -> None:
-     LibraryItem._next_id += 1
-     self.id: int = LibraryItem._next_id # instance attribute
+   def __init__(self, title: str, author: str, year: int, available:bool =True,id:int|None=None) -> None:
+     if id is None:
+      LibraryItem._next_id += 1
+      self.id=LibraryItem._next_id
+     else:
+      self.id=id
+      if id > LibraryItem._next_id:
+       LibraryItem._next_id=id
      self.title = title
      self.author = author
      self.year = year # runs the setter below
-     self._available = True # protected state
+     self._available = available # protected state
 
    @property
    def year(self) -> int:

@@ -10,12 +10,14 @@ from abc import ABC,abstractmethod
 
 MENU = """
 1. Add item
-2. List items
-3. Search item
-4. Register member
-5. Borrow item
-6. Return item
-7. Remove item
+2. Search item
+3. Register member
+4. Borrow item
+5. Return item
+6. Remove item
+7. Update item
+8. Loans
+9.Display
 0. Exit
 """
 
@@ -46,9 +48,9 @@ class Add_item:
         library.add(item)
         print(f"Added: {item}")
 
-class List_items:
-    def list_items(self,library: Library) -> None:
-        print_catalog(library._items)
+class Display:
+    def dis(self,library:Library):
+        library.display()        
 
 class Search_item:
     def search_item(self,library: Library) -> None:
@@ -58,10 +60,10 @@ class Search_item:
             return
         results = library.find(title)
         if not results:
-            print("Item Not found")
+            print("Item Not found/May be borrowed!!")
             return
         for item in results:
-            print(item)
+            print(item)  
 
 class Make_member(ABC):
 
@@ -120,14 +122,25 @@ class Remove_item:
         library.remove(item_id)
         print("Removed.")
 
+class Update_item:
+    def update_item(self,library:Library) -> None:
+        item_id=int(input("Item ID: "))
+        library.update(item_id) 
+
+class Loan:
+    def loans(self,library:Library):
+        library.loan()            
+
 a=Add_item()
-l=List_items()
 lo=Login()
 s=Search_item()
 r=Register_member()
 b=Borrow_item()
 re=Return_item()
 rm=Remove_item()
+u=Update_item()
+la=Loan()
+d=Display()
 
 def run(library: Library) -> None:
     member = lo.login(library)
@@ -135,12 +148,14 @@ def run(library: Library) -> None:
 
     options_staff = {
         "1": a.add_item,
-        "2": l.list_items,
-        "3": s.search_item,
-        "4": r.register_member,
-        "5": lambda lib: b.borrow_item(lib, member),
-        "6": lambda lib: re.return_item(lib, member),
-        "7": rm.remove_item,
+        "2": s.search_item,
+        "3": r.register_member,
+        "4": lambda lib: b.borrow_item(lib, member),
+        "5": lambda lib: re.return_item(lib, member),
+        "6": rm.remove_item,
+        "7": u.update_item,
+        "8": la.loans,
+        "9":d.dis
     }
     options_student = {
         "1": lambda lib: b.borrow_item(lib, member),
